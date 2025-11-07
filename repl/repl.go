@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/devasherr/lambda/lexer"
-	"github.com/devasherr/lambda/token"
+	"github.com/devasherr/lambda/parser"
 )
 
 const PROMPT = ">> "
@@ -23,9 +23,25 @@ func Start(in io.Reader, out io.Writer) {
 
 		line := scanner.Text()
 		l := lexer.New(line)
+		p := parser.New(l)
+		program := p.ParseProgram()
 
-		for tok := l.NextToken(); tok.Type != token.EOF; tok = l.NextToken() {
-			fmt.Fprintf(out, "%+v\n", tok)
+		if len(p.Errors()) != 0 {
+			printParserErros(out, p.Errors())
+			continue
 		}
+
+		io.WriteString(out, program.String())
+		io.WriteString(out, "\n")
+	}
+}
+
+func printParserErros(out io.Writer, errors []string) {
+	if len(errors) > 1 {
+		io.WriteString(out, "parser error:\n")
+	}
+
+	for _, msg := range errors {
+		io.WriteString(out, "\t"+msg+"\n")
 	}
 }
