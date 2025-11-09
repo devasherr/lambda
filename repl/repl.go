@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/devasherr/lambda/evaluator"
 	"github.com/devasherr/lambda/lexer"
 	"github.com/devasherr/lambda/parser"
 )
@@ -31,13 +32,16 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		io.WriteString(out, program.String())
-		io.WriteString(out, "\n")
+		evaluated := evaluator.Eval(program)
+		if evaluated != nil {
+			io.WriteString(out, evaluated.Inspect())
+			io.WriteString(out, "\n")
+		}
 	}
 }
 
 func printParserErros(out io.Writer, errors []string) {
-	if len(errors) > 1 {
+	if len(errors) > 0 {
 		io.WriteString(out, "parser error:\n")
 	}
 
