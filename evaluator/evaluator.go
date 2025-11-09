@@ -5,6 +5,13 @@ import (
 	"github.com/devasherr/lambda/object"
 )
 
+// since bool is either true or false, no need to create new object every time for them
+// that is what nativeBoolToBooleanObject is doing
+var (
+	TRUE  = &object.Boolean{Value: true}
+	FALSE = &object.Boolean{Value: false}
+)
+
 func Eval(node ast.Node) object.Object {
 	switch node := node.(type) {
 	// Statements
@@ -16,6 +23,8 @@ func Eval(node ast.Node) object.Object {
 	// Expressions
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
+	case *ast.Boolean:
+		return nativeBoolToBooleanObject(node.Value)
 	}
 
 	return nil
@@ -29,4 +38,12 @@ func evalStatements(stmts []ast.Statment) object.Object {
 	}
 
 	return result
+}
+
+func nativeBoolToBooleanObject(value bool) *object.Boolean {
+	if value {
+		return TRUE
+	}
+
+	return FALSE
 }
