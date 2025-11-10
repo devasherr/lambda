@@ -1,6 +1,8 @@
 package evaluator
 
 import (
+	"fmt"
+
 	"github.com/devasherr/lambda/ast"
 	"github.com/devasherr/lambda/object"
 )
@@ -22,6 +24,8 @@ func Eval(node ast.Node) object.Object {
 		return evalStatements(node.Statments)
 	case *ast.ExpressionStatment:
 		return Eval(node.Expression)
+	case *ast.BlockStatement:
+		return evalStatements(node.Statements)
 
 	// Expressions
 	case *ast.IntegerLiteral:
@@ -35,6 +39,8 @@ func Eval(node ast.Node) object.Object {
 		left := Eval(node.Left)
 		right := Eval(node.Right)
 		return evalInfixExpression(node.Operator, left, right)
+	case *ast.IfExpression:
+		return evalIfExpression(node)
 	}
 
 	return nil
@@ -135,5 +141,31 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 
 	default:
 		return NULL
+	}
+}
+
+func evalIfExpression(node *ast.IfExpression) object.Object {
+	condition := Eval(node.Condition)
+
+	if isTruthy(condition) {
+		fmt.Printf("node.Consequence: %T\n", node.Consequence)
+		val := Eval(node.Consequence)
+		fmt.Println("val: ", val)
+		return val
+	} else if node.Alternative != nil {
+		return Eval(node.Alternative)
+	} else {
+		return NULL
+	}
+}
+
+func isTruthy(obj object.Object) bool {
+	switch obj {
+	case NULL:
+		return false
+	case FALSE:
+		return false
+	default:
+		return true
 	}
 }
