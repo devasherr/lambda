@@ -84,7 +84,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 			return function
 		}
 
-		// we found to evaluate the args before passing to the funtion
+		// we have to evaluate the args before passing to the funtion
 		// add(2+2, 5+5) need to be add(4, 10)
 		args := evalExpression(node.Arguments, env)
 		if len(args) == 1 && isError(args[0]) {
@@ -92,6 +92,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		}
 
 		return applyFunction(function, args)
+	case *ast.StringLiteral:
+		return &object.String{Value: node.Value}
 	}
 
 	return nil
