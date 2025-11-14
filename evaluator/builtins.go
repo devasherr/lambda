@@ -1,6 +1,8 @@
 package evaluator
 
 import (
+	"fmt"
+
 	"github.com/devasherr/lambda/object"
 )
 
@@ -90,6 +92,15 @@ var builtins = map[string]*object.BuiltIn{
 			newArray = append(newArray, array.Elements...)
 			newArray = append(newArray, args[1])
 			return &object.Array{Elements: newArray}
+		},
+	},
+	"puts": &object.BuiltIn{
+		Fn: func(args ...object.Object) object.Object {
+			for _, arg := range args {
+				fmt.Println(arg.Inspect())
+			}
+
+			return NULL
 		},
 	},
 }
