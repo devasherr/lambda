@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/devasherr/lambda/ast"
 	"github.com/devasherr/lambda/object"
@@ -374,8 +375,12 @@ func evalArrayIndexExpression(array, index object.Object) object.Object {
 	idx := index.(*object.Integer).Value
 	bound := int64(len(arrayObject.Elements) - 1)
 
-	if idx < 0 || idx > bound {
+	if idx > 0 && idx > bound || idx < 0 && math.Abs(float64(idx)) > float64(bound+1) {
 		return NULL
+	}
+
+	if idx < 0 {
+		idx = int64(len(arrayObject.Elements)) + idx
 	}
 
 	return arrayObject.Elements[idx]
