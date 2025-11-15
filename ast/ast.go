@@ -12,7 +12,7 @@ type Node interface {
 	String() string
 }
 
-type Statment interface {
+type Statement interface {
 	Node
 	statementNode()
 }
@@ -23,20 +23,20 @@ type Expression interface {
 }
 
 type Program struct {
-	Statments []Statment
+	Statements []Statement
 }
 
 func (p *Program) TokenLiteral() string {
-	if len(p.Statments) == 0 {
+	if len(p.Statements) == 0 {
 		return ""
 	}
 
-	return p.Statments[0].TokenLiteral()
+	return p.Statements[0].TokenLiteral()
 }
 
 func (p *Program) String() string {
 	var out bytes.Buffer
-	for _, stmt := range p.Statments {
+	for _, stmt := range p.Statements {
 		out.WriteString(stmt.String())
 	}
 	return out.String()
@@ -74,14 +74,14 @@ func (ls *LetStatement) String() string {
 	return out.String()
 }
 
-type ReturnStatment struct {
+type ReturnStatement struct {
 	Token       token.Token
 	ReturnValue Expression
 }
 
-func (rs *ReturnStatment) statementNode()       {}
-func (rs *ReturnStatment) TokenLiteral() string { return rs.Token.Literal }
-func (rs *ReturnStatment) String() string {
+func (rs *ReturnStatement) statementNode()       {}
+func (rs *ReturnStatement) TokenLiteral() string { return rs.Token.Literal }
+func (rs *ReturnStatement) String() string {
 	var out bytes.Buffer
 
 	out.WriteString(rs.TokenLiteral() + " ")
@@ -94,18 +94,18 @@ func (rs *ReturnStatment) String() string {
 	return out.String()
 }
 
-// ExpressionStatment allow for one line expressions to be perceived as statments
+// ExpressionStatement allow for one line expressions to be perceived as statments
 // let x = 10;
 // x += 10;
 // both lines are valid statements
-type ExpressionStatment struct {
+type ExpressionStatement struct {
 	Token      token.Token // first token of the expression
 	Expression Expression
 }
 
-func (es *ExpressionStatment) statementNode()       {}
-func (es *ExpressionStatment) TokenLiteral() string { return es.Token.Literal }
-func (es *ExpressionStatment) String() string {
+func (es *ExpressionStatement) statementNode()       {}
+func (es *ExpressionStatement) TokenLiteral() string { return es.Token.Literal }
+func (es *ExpressionStatement) String() string {
 	if es.Expression != nil {
 		return es.Expression.String()
 	}
@@ -172,7 +172,7 @@ func (b *Boolean) String() string       { return b.Token.Literal }
 
 type BlockStatement struct {
 	Token      token.Token
-	Statements []Statment
+	Statements []Statement
 }
 
 func (bs *BlockStatement) statementNode()       {}

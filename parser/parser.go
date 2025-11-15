@@ -117,12 +117,12 @@ func (p *Parser) peekError(t token.TokenType) {
 
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
-	program.Statments = []ast.Statment{}
+	program.Statements = []ast.Statement{}
 
 	for p.curToken.Type != token.EOF {
 		stmt := p.parseStatment()
 		if stmt != nil {
-			program.Statments = append(program.Statments, stmt)
+			program.Statements = append(program.Statements, stmt)
 		}
 		p.nextToken()
 	}
@@ -130,14 +130,14 @@ func (p *Parser) ParseProgram() *ast.Program {
 	return program
 }
 
-func (p *Parser) parseStatment() ast.Statment {
+func (p *Parser) parseStatment() ast.Statement {
 	switch p.curToken.Type {
 	case token.LET:
 		return p.parseLetStatment()
 	case token.RETURN:
-		return p.parseReturnStatment()
+		return p.parseReturnStatement()
 	default:
-		return p.parseExpressionStatment()
+		return p.parseExpressionStatement()
 	}
 }
 
@@ -183,8 +183,8 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 	}
 }
 
-func (p *Parser) parseReturnStatment() ast.Statment {
-	stmt := &ast.ReturnStatment{Token: p.curToken}
+func (p *Parser) parseReturnStatement() ast.Statement {
+	stmt := &ast.ReturnStatement{Token: p.curToken}
 	p.nextToken()
 
 	stmt.ReturnValue = p.parseExpression(LOWEST)
@@ -220,10 +220,10 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 	return leftExp
 }
 
-func (p *Parser) parseExpressionStatment() *ast.ExpressionStatment {
-	// defer untrace(trace("parseExpressionStatment()"))
+func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+	// defer untrace(trace("parseExpressionStatement()"))
 
-	stmt := &ast.ExpressionStatment{Token: p.curToken}
+	stmt := &ast.ExpressionStatement{Token: p.curToken}
 	stmt.Expression = p.parseExpression(LOWEST)
 
 	if p.peekTokenIs(token.SEMICOLON) {
@@ -364,7 +364,7 @@ func (p *Parser) parseFunctionLiteral() ast.Expression {
 
 func (p *Parser) parseBlockStatement() *ast.BlockStatement {
 	block := &ast.BlockStatement{Token: p.curToken}
-	block.Statements = []ast.Statment{}
+	block.Statements = []ast.Statement{}
 
 	p.nextToken()
 
